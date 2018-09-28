@@ -1,4 +1,4 @@
-function TrackTimeLimit() {
+function CountDown() {
   this.format = 'M:S';
   this.error = null;
   this.display = null;
@@ -9,11 +9,16 @@ function TrackTimeLimit() {
   this.status = 'IDLE';
 }
 
-TrackTimeLimit.prototype.setStatus = function(status) {
+CountDown.prototype.setFormat = function(format) {
+  this.format = format;
+  return this;
+};
+
+CountDown.prototype.setStatus = function(status) {
   this.status = status;
 };
 
-TrackTimeLimit.prototype.start = function(cb) {
+CountDown.prototype.start = function(cb) {
   var self = this;
   if(this.status === 'RUNNING') {
     return false;
@@ -47,7 +52,7 @@ TrackTimeLimit.prototype.start = function(cb) {
   }
 };
 
-TrackTimeLimit.prototype.timerAtZero = function() {
+CountDown.prototype.timerAtZero = function() {
 
   if(this.hours <= 0 && this.minutes <= 0 && this.seconds <= 0) {
     this.hours = 0;
@@ -58,7 +63,7 @@ TrackTimeLimit.prototype.timerAtZero = function() {
   } else return false;
 };
 
-TrackTimeLimit.prototype.displayFeed = function(str, callback) {
+CountDown.prototype.displayFeed = function(str, callback) {
   try {
     var self = this;
     var char = '';
@@ -80,10 +85,10 @@ TrackTimeLimit.prototype.displayFeed = function(str, callback) {
     throw err;
   }
 
- callback(char, done);
+  callback(char, done);
 };
 
-TrackTimeLimit.prototype.getDisplayNumber = function(char, done) {
+CountDown.prototype.getDisplayNumber = function(char, done) {
   var self = this;
 
   this.settings(char, function(newChar) {
@@ -95,7 +100,7 @@ TrackTimeLimit.prototype.getDisplayNumber = function(char, done) {
   })
 };
 
-TrackTimeLimit.prototype.translate = function(char, callback) {
+CountDown.prototype.translate = function(char, callback) {
   if(this.settings[char] === undefined) {
     return callback(char);
   } else {
@@ -105,7 +110,7 @@ TrackTimeLimit.prototype.translate = function(char, callback) {
   }
 };
 
-TrackTimeLimit.prototype.evenOutNumbers = function() {
+CountDown.prototype.evenOutNumbers = function() {
   var tempNumber = 0;
 
   if(this.seconds >= 60) {
@@ -122,7 +127,7 @@ TrackTimeLimit.prototype.evenOutNumbers = function() {
   }
 };
 
-TrackTimeLimit.prototype.setDisplay = function(selector = null) {
+CountDown.prototype.setDisplay = function(selector = null) {
   var self = this;
   this.evenOutNumbers();
 
@@ -151,18 +156,18 @@ TrackTimeLimit.prototype.setDisplay = function(selector = null) {
   }
 };
 
-TrackTimeLimit.prototype.addHours = function(num, cb) {
+CountDown.prototype.addHours = function(num, cb) {
   this.hours += num;
   if(typeof cb === 'undefined') return this;
   cb();
 };
-TrackTimeLimit.prototype.addMinutes = function(num, cb) {
+CountDown.prototype.addMinutes = function(num, cb) {
   this.minutes += num;
 
   if(typeof cb === 'undefined') return this;
   cb();
 };
-TrackTimeLimit.prototype.addSeconds = function(num, cb) {
+CountDown.prototype.addSeconds = function(num, cb) {
   this.seconds += num;
   this.setDisplay();
 
@@ -170,10 +175,10 @@ TrackTimeLimit.prototype.addSeconds = function(num, cb) {
   cb();
 };
 
-TrackTimeLimit.prototype.barrowHour = function(cb) {
+CountDown.prototype.barrowHour = function(cb) {
   this.subHour(cb)
 };
-TrackTimeLimit.prototype.barrowMinute = function(cb) {
+CountDown.prototype.barrowMinute = function(cb) {
   this.barrowHour(function(success) {
     if(!success) {
       cb(false);
@@ -185,7 +190,7 @@ TrackTimeLimit.prototype.barrowMinute = function(cb) {
   })
 };
 
-TrackTimeLimit.prototype.subHour = function(cb) {
+CountDown.prototype.subHour = function(cb) {
   if(this.hours === 0) {
     cb(false);
   } else {
@@ -193,8 +198,8 @@ TrackTimeLimit.prototype.subHour = function(cb) {
     cb(true);
   }
 };
-TrackTimeLimit.prototype.subMinute = function(cb) {
-  console.log(this.minutes);
+CountDown.prototype.subMinute = function(cb) {
+  var self = this;
   if(this.minutes === 0) {
     this.subHour(function(success) {
       if(!success) {
@@ -209,7 +214,7 @@ TrackTimeLimit.prototype.subMinute = function(cb) {
     cb(true);
   }
 };
-TrackTimeLimit.prototype.subSecond = function(cb) {
+CountDown.prototype.subSecond = function(cb) {
   var self = this;
   if(this.seconds === 0) {
     this.subMinute(function(success) {
@@ -228,7 +233,7 @@ TrackTimeLimit.prototype.subSecond = function(cb) {
   }
 };
 
-TrackTimeLimit.prototype.settings = function(settingCheck, cb) {
+CountDown.prototype.settings = function(settingCheck, cb) {
   var returnMe = null;
   switch(settingCheck) {
     case 'h':
